@@ -33,22 +33,7 @@
   .reveal.d1{transition-delay:.08s} .reveal.d2{transition-delay:.16s} .reveal.d3{transition-delay:.24s}
 
   /* ============ الشعار المتحرك ============ */
-  .nut{position:relative;display:block;width:100%}
-  .nut img{width:100%;height:auto;display:block}
-  .nut.anim .pt{position:absolute;object-fit:contain}
-  .nut-dot{
-    position:absolute;left:95.03%;top:44.55%;
-    width:6.62%;aspect-ratio:1;transform:translate(-50%,-50%);
-    background:var(--lime);border-radius:50%;
-  }
-  .nut:not(.anim) .nut-dot{top:58.62%}
-  /* دخول الحروف متدرجًا — قناع صعود مثل مقدمات آبل */
-  .anim .pt{opacity:0;transform:translateY(26%);animation:rise 1s var(--ease-out) forwards}
-  .anim .p-n{animation-delay:.15s}
-  .anim .p-u{animation-delay:.3s}
-  .anim .p-t{animation-delay:.45s}
-  .anim .p-tag{animation-delay:.85s;animation-duration:.9s}
-  @keyframes rise{to{opacity:1;transform:translateY(0)}}
+
   /* النقطة: تسقط، ترتد، ثم تنبض للأبد */
   .anim .nut-dot{
     opacity:0;
