@@ -1232,23 +1232,20 @@ html[dir="rtl"] *{
 
       /* ── محتوى الأعمال: من صفحة الأدمن إن وُجد، وإلا الافتراضي ── */
       const WORK_KEY = "nut.works.v1";
-      function loadWorks(){
-        try{
-          const raw = localStorage.getItem(WORK_KEY);
-          if(raw){ const p = JSON.parse(raw); if(Array.isArray(p) && p.length) return p; }
-        }catch(e){}
-        return WORKS;
-      }
-      let LIVE = loadWorks();
-      fetch('./works.json')
-  .then(r => r.json())
+      let LIVE = WORKS;
+
+fetch('./works.json?v=' + Date.now(), { cache: 'no-store' })
+  .then(r => {
+    if (!r.ok) throw new Error('Works JSON failed: ' + r.status);
+    return r.json();
+  })
   .then(data => {
     if (Array.isArray(data) && data.length) {
       LIVE = data;
       if (railMode === "work") buildRail();
     }
   })
-  .catch(() => {});
+  .catch(err => console.error('Works loading error:', err));
       addEventListener("storage", e => {          // الأدمن مفتوح في تبويب ثانٍ
         if(e.key === WORK_KEY){ LIVE = loadWorks(); if(railMode==="work") buildRail(); }
       });
