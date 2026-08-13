@@ -2300,5 +2300,93 @@ btn.addEventListener("click", () => flyOpen(row));
 
     });
   </script>
- 
+ <!-- ═══ NUT PATCH · تباعد الحروف + الأعمال على الجوال ═══
+     الصقها مباشرة قبل </body> في index.html
+     لا تغيّر التصميم ولا الشعار ولا أيقونة التبويب        -->
+<style id="nut-patch">
+  /* ١ · العربية: إلغاء تباعد الحروف القادم من الأنماط المضمّنة
+        (الحروف العربية متصلة، والتباعد يفكّها) — RTL فقط        */
+  html[dir="rtl"] [style*="letter-spacing"],
+  html[dir="rtl"] .quiet-nav a,
+  html[dir="rtl"] .quiet-nav button,
+  html[dir="rtl"] .work-title,
+  html[dir="rtl"] .work-eyebrow,
+  html[dir="rtl"] .work-description,
+  html[dir="rtl"] .work-link,
+  html[dir="rtl"] .object-caption,
+  html[dir="rtl"] .object-hint,
+  html[dir="rtl"] .footer-line,
+  html[dir="rtl"] .notice,
+  html[dir="rtl"] .discovery,
+  html[dir="rtl"] .wrow-name,
+  html[dir="rtl"] .wrow-cat,
+  html[dir="rtl"] .rail-label,
+  html[dir="rtl"] .rail-hint,
+  html[dir="rtl"] .study-name,
+  html[dir="rtl"] .study-cat,
+  html[dir="rtl"] .study-lede,
+  html[dir="rtl"] .study-ch h3,
+  html[dir="rtl"] .study-ch p,
+  html[dir="rtl"] .leaf-lines,
+  html[dir="rtl"] .leaf-note,
+  html[dir="rtl"] .blk-text p,
+  html[dir="rtl"] .blk-quote p,
+  html[dir="rtl"] figcaption {
+    letter-spacing: 0 !important;
+    word-spacing: normal !important;
+  }
+  /* الأرقام واللاتيني تبقى بتباعدها الأصلي */
+  html[dir="rtl"] .study-res b,
+  html[dir="rtl"] .sp-r b,
+  html[dir="rtl"] .pjr b { letter-spacing: -.02em !important; direction: ltr; }
+
+  /* ٢ · الجوال: ضمان ظهور قائمة الأعمال وإمكانية التمرير واللمس */
+  @media (max-width: 900px) {
+    .canvas.is-live { overflow: hidden; }
+    .canvas.is-live .rail {
+      position: absolute; inset: 0;
+      display: block !important;
+      overflow-y: auto !important;
+      -webkit-overflow-scrolling: touch;
+      padding: 118px 0 96px !important;
+      touch-action: pan-y !important;
+    }
+    .canvas.is-live .wrow { display: block !important; }
+    .canvas.is-live .wrow-btn {
+      display: flex !important;
+      flex-wrap: wrap;
+      align-items: baseline;
+      gap: 8px;
+      padding: 16px 6vw !important;
+      min-height: 56px;                 /* هدف لمس مريح */
+    }
+    .canvas.is-live .wrow-name {
+      font-size: clamp(26px, 8.5vw, 46px) !important;
+      line-height: 1.4 !important;
+      opacity: 1 !important;            /* لا تعتيم بلا hover على اللمس */
+    }
+    .canvas.is-live .wrow-cat {
+      opacity: 1 !important; transform: none !important;
+      margin-inline-start: 0; width: 100%;
+    }
+    .rail.is-hunting .wrow:not(:hover) .wrow-name { opacity: 1 !important; }
+    .peek { display: none !important; }
+    /* صفحة المشروع: تمرير سليم على اللمس */
+    .study.on { -webkit-overflow-scrolling: touch; overscroll-behavior: contain; }
+    .blk { transform: none !important; margin-inline: auto !important; }
+  }
+</style>
+<script>
+(function () {
+  /* ٣ · على الأجهزة اللمسية: النقر يفتح العمل مباشرة بلا حاجة لـ hover */
+  var touch = window.matchMedia('(hover: none)').matches;
+  if (!touch) return;
+  document.addEventListener('click', function (e) {
+    var row = e.target.closest && e.target.closest('.wrow');
+    if (!row) return;
+    var rail = row.parentElement;
+    if (rail && rail.classList) rail.classList.remove('is-hunting');
+  }, true);
+})();
+</script>
 </body></html>
