@@ -1249,7 +1249,9 @@
             peek.classList.remove("is-on");
             tx = 0; kick();
           });
-          row.querySelector(".wrow-btn").addEventListener("click", () => flyOpen(row));
+          const btn = row.querySelector(".wrow-btn");
+btn.addEventListener("pointerdown", e => e.stopPropagation());
+btn.addEventListener("click", () => flyOpen(row));
         });
       }
 
