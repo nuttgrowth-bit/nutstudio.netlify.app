@@ -1240,6 +1240,15 @@ html[dir="rtl"] *{
         return WORKS;
       }
       let LIVE = loadWorks();
+      fetch('./works.json')
+  .then(r => r.json())
+  .then(data => {
+    if (Array.isArray(data) && data.length) {
+      LIVE = data;
+      if (railMode === "work") buildRail();
+    }
+  })
+  .catch(() => {});
       addEventListener("storage", e => {          // الأدمن مفتوح في تبويب ثانٍ
         if(e.key === WORK_KEY){ LIVE = loadWorks(); if(railMode==="work") buildRail(); }
       });
