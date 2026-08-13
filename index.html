@@ -52,7 +52,29 @@
     html[dir="rtl"] .work-eyebrow {
       line-height: 1.45;
     }
+@media (max-width:600px){
+  html[dir="rtl"] body{
+    line-height:1.8;
+  }
 
+  html[dir="rtl"] .work-title,
+  html[dir="rtl"] .work-eyebrow{
+    line-height:1.5;
+  }
+
+  html[dir="rtl"] .hero-title,
+  html[dir="rtl"] h1{
+    line-height:1.25;
+    word-break:normal;
+    overflow-wrap:normal;
+  }
+
+  html[dir="rtl"] .lead,
+  html[dir="rtl"] p{
+    overflow-wrap:break-word;
+    word-break:normal;
+  }
+}
     button, a { -webkit-tap-highlight-color: transparent; }
     button:focus-visible, a:focus-visible {
       outline: 1px solid var(--acid);
