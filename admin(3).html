@@ -1,0 +1,616 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NUT. — Visual CMS</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Kufi+Arabic:wght@400;500;600;700&display=swap');
+:root{--bg:#0b0b0b;--panel:#141414;--panel2:#1b1b1b;--line:#303030;--text:#f4f4f0;--muted:#8e8e88;--accent:#d7ff3f;--danger:#ff6464}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--text);font-family:Inter,"Noto Kufi Arabic",sans-serif}
+button,input,textarea,select{font:inherit}button{cursor:pointer}
+.top{position:sticky;top:0;z-index:20;display:flex;align-items:center;justify-content:space-between;gap:16px;padding:18px 24px;background:rgba(11,11,11,.92);backdrop-filter:blur(18px);border-bottom:1px solid var(--line)}
+.brand{font-weight:800;letter-spacing:-.04em;font-size:24px}.brand span{color:var(--accent)}
+.top-actions{display:flex;gap:8px;flex-wrap:wrap}
+.btn{border:1px solid var(--line);background:#191919;color:var(--text);padding:10px 14px;border-radius:8px}
+.btn:hover{border-color:#666}.btn.primary{background:var(--accent);color:#090909;border-color:var(--accent);font-weight:700}.btn.danger{color:#ff8b8b}
+.wrap{max-width:1400px;margin:auto;padding:28px 24px 80px}
+.hero{display:flex;align-items:end;justify-content:space-between;gap:24px;margin:10px 0 28px}.hero h1{font-size:clamp(34px,6vw,72px);margin:0;letter-spacing:-.055em}.hero p{color:var(--muted);max-width:600px;line-height:1.8;margin:10px 0 0}
+.status{font-size:12px;color:var(--muted);white-space:nowrap}
+.project{border:1px solid var(--line);background:var(--panel);margin:14px 0;border-radius:14px;overflow:hidden}
+.project-head{display:grid;grid-template-columns:auto 72px 1fr auto;gap:14px;align-items:center;padding:14px 16px}.grip{font-size:22px;color:#777;cursor:grab}.thumb{width:72px;height:52px;border-radius:7px;overflow:hidden;background:#222;object-fit:cover}.head-title{min-width:0}.head-title strong{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.head-title small{color:var(--muted)}.head-actions{display:flex;gap:6px}
+.body{display:none;border-top:1px solid var(--line);padding:18px}.project.open .body{display:block}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}.field label{display:block;font-size:11px;color:var(--muted);margin:0 0 7px}.field input,.field textarea,.field select{width:100%;background:#0e0e0e;color:var(--text);border:1px solid var(--line);border-radius:7px;padding:10px;outline:none}.field textarea{min-height:90px;resize:vertical}.field input:focus,.field textarea:focus,.field select:focus{border-color:#777}
+.section{border-top:1px solid #292929;margin-top:22px;padding-top:18px}.section h3{font-size:13px;margin:0 0 14px}
+.media-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}.media-card{background:#101010;border:1px solid var(--line);border-radius:10px;padding:10px}.media-label{font-size:11px;color:var(--muted);margin-bottom:8px}.drop{position:relative;aspect-ratio:4/3;border:1px dashed #454545;border-radius:8px;overflow:hidden;background:#171717;display:grid;place-items:center;color:#777;text-align:center;font-size:11px}.drop.has{cursor:grab}.drop img,.drop video{width:100%;height:100%;object-fit:cover;transform-origin:center;pointer-events:none}.drop .clear{position:absolute;top:7px;left:7px;width:25px;height:25px;border:0;border-radius:50%;background:rgba(0,0,0,.75);color:#fff;z-index:2}.ratio{display:flex;gap:5px;flex-wrap:wrap;margin-top:8px}.ratio button{font-size:10px;padding:6px 8px;border-radius:5px;border:1px solid var(--line);background:#191919;color:#aaa}.ratio button.on{background:var(--accent);color:#111;border-color:var(--accent)}.zoom{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:10px;color:#888}.zoom input{flex:1}
+.lang-tabs{display:flex;gap:6px;margin-bottom:12px}.lang-tabs button{border:1px solid var(--line);background:#171717;color:#aaa;padding:7px 12px;border-radius:6px}.lang-tabs button.on{background:#eee;color:#111}
+.empty{padding:50px;text-align:center;color:var(--muted);border:1px dashed var(--line);border-radius:12px}
+.toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(20px);opacity:0;background:#f3f3ed;color:#111;padding:11px 16px;border-radius:7px;font-size:12px;z-index:100;transition:.2s}.toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+.note{font-size:11px;color:#777;line-height:1.8}
+@media(max-width:800px){.grid,.media-grid{grid-template-columns:1fr}.hero{display:block}.project-head{grid-template-columns:auto 56px 1fr}.head-actions{grid-column:3}.top{align-items:flex-start;flex-direction:column}}
+
+/* NUT VISUAL CMS */
+.cms-shell{margin:0 0 34px;border:1px solid var(--line);border-radius:14px;background:#101010;overflow:hidden}
+.cms-tabs{display:flex;gap:0;border-bottom:1px solid var(--line);overflow:auto}
+.cms-tab{border:0;border-left:1px solid var(--line);background:#151515;color:#888;padding:13px 18px;white-space:nowrap}
+.cms-tab.active{background:#242424;color:#fff}
+.cms-pane{display:none;padding:18px}.cms-pane.active{display:block}
+.cms-layout{display:grid;grid-template-columns:220px minmax(0,1fr) 280px;min-height:600px}
+.cms-pages{border-left:1px solid var(--line);padding:12px}.cms-pages h3,.cms-inspector h3{font-size:11px;color:#777;margin:4px 0 10px}
+.cms-page{display:flex;align-items:center;justify-content:space-between;gap:8px;width:100%;border:1px solid transparent;background:transparent;color:#bbb;padding:10px;border-radius:7px;text-align:right;margin-bottom:5px}
+.cms-page.active{background:#222;border-color:#3a3a3a;color:#fff}
+.cms-page small{color:#666}.cms-canvas{padding:14px;min-width:0;background:#0c0c0c}.cms-inspector{border-right:1px solid var(--line);padding:14px}
+.cms-block{position:relative;border:1px solid #2c2c2c;background:#151515;border-radius:10px;padding:16px;margin-bottom:10px;cursor:grab}
+.cms-block:hover{border-color:#555}.cms-block.selected{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+.cms-block.hidden{opacity:.4}.cms-block-head{display:flex;align-items:center;gap:8px;margin-bottom:10px}.cms-drag{color:#777;font-size:18px}.cms-kind{font-size:10px;color:#777;flex:1}.cms-preview-title{font-size:clamp(26px,5vw,62px);letter-spacing:-.05em;margin:5px 0}.cms-preview-copy{color:#aaa;line-height:1.8;max-width:60ch}.cms-preview-btn{display:inline-block;margin-top:12px;border:1px solid #555;padding:9px 13px;border-radius:6px;color:#fff}
+.cms-addbar{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px}.cms-addbar button{border:1px solid var(--line);background:#181818;color:#bbb;border-radius:6px;padding:8px 10px;font-size:11px}
+.cms-field{margin-bottom:12px}.cms-field label{display:block;font-size:10px;color:#777;margin-bottom:6px}.cms-field input,.cms-field textarea,.cms-field select{width:100%;background:#0b0b0b;color:#eee;border:1px solid #303030;border-radius:6px;padding:9px}.cms-field textarea{min-height:82px;resize:vertical}
+.cms-two{display:grid;grid-template-columns:1fr 1fr;gap:8px}.cms-check{display:flex;align-items:center;gap:8px;color:#aaa;font-size:11px}.cms-color{display:flex;gap:7px;align-items:center}.cms-color input[type=color]{width:38px;height:32px;padding:2px;border:1px solid #333;background:#111}
+.cms-actions{display:flex;gap:7px;flex-wrap:wrap;margin-top:12px}.cms-actions button{border:var(--cms-btn-border,1px) solid var(--line);background:#191919;color:#ccc;border-radius:6px;padding:9px 11px}.cms-actions .primary{background:var(--accent);color:#111;border-color:var(--accent);font-weight:700}
+.cms-empty{border:1px dashed #333;border-radius:10px;padding:40px;text-align:center;color:#666}
+.cms-preview{border:1px solid #303030;border-radius:10px;min-height:420px;padding:clamp(24px,5vw,70px);background:#0b0b0b;overflow:hidden}
+.cms-preview .cms-preview-image{width:100%;height:180px;object-fit:cover;border-radius:8px;margin:8px 0 16px}
+.cms-meta{font-size:10px;color:#666;margin-top:8px}.cms-note{font-size:10px;color:#666;line-height:1.7}
+@media(max-width:1050px){.cms-layout{grid-template-columns:170px minmax(0,1fr)}.cms-inspector{grid-column:1/-1;border-right:0;border-top:1px solid var(--line)}}
+@media(max-width:700px){.cms-layout{grid-template-columns:1fr}.cms-pages{border-left:0;border-bottom:1px solid var(--line)}}
+
+
+/* NUT CMS v2 — full brand/header/footer + visual media controls */
+.cms-logo-editor{display:grid;grid-template-columns:110px 1fr;gap:14px;align-items:start}
+.cms-logo-mark{height:100px;border:1px dashed #444;border-radius:10px;display:grid;place-items:center;background:#0b0b0b}
+.cms-logo-mark .nut-word{font-size:42px;font-weight:800;letter-spacing:-.08em}
+.cms-logo-mark .nut-dot{color:var(--accent)}
+.cms-media-editor{border:1px solid #303030;border-radius:10px;padding:12px;background:#101010}
+.cms-media-frame{position:relative;width:100%;min-height:220px;overflow:hidden;border:1px dashed #454545;border-radius:8px;background:#171717;resize:both}
+.cms-media-frame img,.cms-media-frame video{width:100%;height:100%;min-height:220px;object-fit:cover;transform-origin:center;pointer-events:none;display:block}
+.cms-media-frame .media-empty{height:220px;display:grid;place-items:center;color:#666;font-size:11px;text-align:center}
+.cms-media-frame .media-clear{position:absolute;top:8px;left:8px;z-index:3;border:0;background:rgba(0,0,0,.8);color:#fff;border-radius:50%;width:28px;height:28px}
+.cms-media-tools{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.cms-media-tools .cms-field{margin:0}
+.cms-drop-zone{border:1px dashed #4b4b4b;border-radius:7px;padding:10px;text-align:center;color:#777;font-size:10px;margin-top:8px}
+.cms-drop-zone.drag{border-color:var(--accent);color:var(--accent)}
+.cms-logo-preview{display:flex;align-items:center;gap:8px}
+.cms-logo-preview img{max-width:100%;max-height:70px;object-fit:contain}
+.cms-logo-preview .logo-text{font-size:38px;font-weight:800;letter-spacing:-.08em}
+.cms-logo-preview .logo-dot{color:var(--accent)}
+.cms-section-title{font-size:13px;color:#ddd;margin:18px 0 10px;padding-bottom:8px;border-bottom:1px solid #2a2a2a}
+.cms-full-width{grid-column:1/-1}
+.cms-frame-controls{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.cms-frame-controls button{border:1px solid var(--line);background:#181818;color:#aaa;border-radius:6px;padding:7px;font-size:10px}
+.cms-frame-controls button.on{background:var(--accent);color:#111;border-color:var(--accent)}
+@media(max-width:700px){.cms-logo-editor{grid-template-columns:1fr}.cms-media-tools{grid-template-columns:1fr}.cms-frame-controls{grid-template-columns:1fr 1fr}}
+
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="brand">NUT<span>.</span> <small style="font-size:10px;color:#777">ADMIN</small></div>
+  <div class="top-actions">
+    <button class="btn" id="openSite">فتح الموقع</button><a class="btn" href="./index.html">الموقع الجديد</a>
+    <button class="btn" id="importBtn">استيراد JSON</button>
+    <button class="btn" id="exportBtn">تصدير JSON</button>
+    <button class="btn primary" id="addBtn">+ إضافة عمل</button>
+    <button class="btn primary" id="saveBtn">حفظ التغييرات</button>
+    <input id="jsonFile" type="file" accept=".json,application/json" hidden>
+  </div>
+</header>
+<main class="wrap">
+  <section class="hero">
+    <div><h1>NUT. Visual CMS</h1><p>تحكم بصري في الموقع كاملًا: الرئيسية، الأعمال، عن NUT.، التواصل، النصوص، الخطوط، الهوية، وترتيب العناصر بالسحب والإفلات.</p></div>
+    <div class="status" id="status">CMS → nut.site.v1 / Works → nut.works.v1</div>
+  </section>
+  
+<section class="cms-shell" id="visualCms">
+  <div class="cms-tabs">
+    <button class="cms-tab active" data-cms-tab="pages">الموقع</button>
+    <button class="cms-tab" data-cms-tab="type">الخطوط والهوية</button>
+    <button class="cms-tab" data-cms-tab="preview">المعاينة</button>
+    <button class="cms-tab" data-cms-tab="data">البيانات</button>
+  </div>
+
+  <div class="cms-pane active" data-cms-pane="pages">
+    <div class="cms-layout">
+      <aside class="cms-pages">
+        <h3>الصفحات</h3>
+        <button class="cms-page active" data-page="home"><span>الرئيسية</span><small>HOME</small></button>
+        <button class="cms-page" data-page="work"><span>أعمالنا</span><small>WORK</small></button>
+        <button class="cms-page" data-page="about"><span>عن NUT.</span><small>ABOUT</small></button>
+        <button class="cms-page" data-page="contact"><span>تواصل معنا</span><small>CONTACT</small></button>
+        <p class="cms-note">اسحب البلوكات لتغيير ترتيبها. اختر أي بلوك لتعديل النص، الخط، الحجم، المحاذاة أو إظهاره.</p>
+      </aside>
+      <section class="cms-canvas">
+        <div class="cms-addbar">
+          <button data-add-block="heading">+ عنوان</button>
+          <button data-add-block="text">+ نص</button>
+          <button data-add-block="button">+ زر</button>
+          <button data-add-block="image">+ صورة</button>
+          <button data-add-block="spacer">+ مسافة</button>
+          <button data-add-block="divider">+ فاصل</button>
+        </div>
+        <div id="cmsBlocks"></div>
+      </section>
+      <aside class="cms-inspector">
+        <h3>المحرر</h3>
+        <div id="cmsInspector"><div class="cms-empty">اختر عنصرًا من الصفحة.</div></div>
+      </aside>
+    </div>
+  </div>
+
+  <div class="cms-pane" data-cms-pane="type">
+    <div class="grid">
+      <div>
+        <div class="cms-field"><label>خط العناوين</label><select id="cmsHeadFont"></select></div>
+        <div class="cms-field"><label>خط النصوص</label><select id="cmsBodyFont"></select></div>
+        <div class="cms-field"><label>خط الواجهة والأزرار</label><select id="cmsUiFont"></select></div>
+        <div class="cms-field"><label>الخط العربي</label><select id="cmsArFont"></select></div>
+      </div>
+      <div>
+        <div class="cms-field"><label>لون الهوية / نقطة الشعار</label><div class="cms-color"><input id="cmsAcid" type="color"><span id="cmsAcidHex">#d7ff3f</span></div></div>
+        <div class="cms-field"><label>خلفية الموقع</label><div class="cms-color"><input id="cmsBg" type="color"><span>Background</span></div></div>
+        <div class="cms-field"><label>لون النص</label><div class="cms-color"><input id="cmsText" type="color"><span>Text</span></div></div>
+        <div class="cms-field"><label>لون النص الثانوي</label><div class="cms-color"><input id="cmsMuted" type="color"><span>Muted</span></div></div>
+      </div>
+    </div>
+
+    <div class="cms-section-title">الشعار</div>
+    <div class="cms-logo-editor">
+      <div class="cms-logo-mark" id="cmsLogoPreview"><div class="nut-word">NUT<span class="nut-dot">.</span></div></div>
+      <div>
+        <div class="cms-field"><label>نص الشعار</label><input id="cmsLogoText" placeholder="NUT"></div>
+        <div class="cms-field"><label>لون نقطة الشعار</label><div class="cms-color"><input id="cmsLogoDot" type="color"></div></div>
+        <div class="cms-field"><label>شعار كصورة (اختياري)</label><input id="cmsLogoSrc" placeholder="رابط الصورة أو Data URL"></div>
+        <div class="cms-actions"><button id="cmsLogoPick">رفع شعار</button><button id="cmsLogoClear">إزالة صورة الشعار</button></div>
+      </div>
+    </div>
+
+    <div class="cms-section-title">الترويسة Header</div>
+    <div class="grid">
+      <div class="cms-field"><label>اسم/عنوان الترويسة عربي</label><input id="cmsHeaderAr"></div>
+      <div class="cms-field"><label>Header title English</label><input id="cmsHeaderEn"></div>
+      <div class="cms-field"><label>زر الأعمال عربي</label><input id="cmsHeaderWorkAr"></div>
+      <div class="cms-field"><label>Work button English</label><input id="cmsHeaderWorkEn"></div>
+    </div>
+
+    <div class="cms-section-title">التذييل Footer</div>
+    <div class="grid">
+      <div class="cms-field"><label>نص التذييل عربي</label><textarea id="cmsFooterAr"></textarea></div>
+      <div class="cms-field"><label>Footer text English</label><textarea id="cmsFooterEn"></textarea></div>
+    </div>
+
+    
+    <div class="cms-section-title">الأزرار — سُمك الحدود</div>
+    <div class="grid">
+      <div class="cms-field">
+        <label>سُمك الحدود في الوضع الداكن (px)</label>
+        <input id="cmsBtnBorder" type="number" min="0" max="6" step=".25" value="1">
+      </div>
+      <div class="cms-field">
+        <label>سُمك الحدود في الوضع الفاتح (px)</label>
+        <input id="cmsBtnBorderLight" type="number" min="0" max="6" step=".25" value="1.5">
+      </div>
+    </div>
+<div class="cms-section-title">إعدادات الصور الافتراضية</div>
+    <div class="grid">
+      <div class="cms-field"><label>طريقة ملء الإطار</label><select id="cmsObjectFit"><option>cover</option><option>contain</option><option>fill</option><option>none</option><option>scale-down</option></select></div>
+      <div class="cms-field"><label>نسبة الإطار الافتراضية</label><select id="cmsDefaultRatio"><option value="3/4">3:4</option><option value="1/1">1:1</option><option value="16/9">16:9</option><option value="4/5">4:5</option><option value="9/16">9:16</option></select></div>
+    </div>
+    <div class="cms-actions"><button class="primary" id="cmsSaveType">حفظ الهوية والخطوط</button></div>
+  </div>
+
+  <div class="cms-pane" data-cms-pane="preview">
+    <div class="cms-preview" id="cmsPreview"></div>
+  </div>
+
+  <div class="cms-pane" data-cms-pane="data">
+    <p class="cms-note">ملف الإعدادات مستقل عن أعمال المشاريع. استخدم التصدير كنسخة احتياطية، ثم يمكن ربطه بملف الموقع ليصبح النشر عامًا لجميع الزوار.</p>
+    <div class="cms-actions">
+      <button class="primary" id="cmsExport">تصدير إعدادات الموقع</button>
+      <button id="cmsImport">استيراد إعدادات الموقع</button>
+      <button id="cmsReset">إعادة إعدادات CMS الافتراضية</button>
+      <input id="cmsJson" type="file" accept=".json,application/json" hidden>
+    </div>
+    <pre id="cmsSummary" style="white-space:pre-wrap;color:#777;font-size:10px;margin-top:18px"></pre>
+  </div>
+</section>
+
+<div id="list"></div>
+  <p class="note">الإصدار الحالي يتضمن Visual CMS كاملًا للشعار والترويسة والتذييل والخطوط والصور، إضافة إلى إدارة الأعمال. ملاحظة: هذه النسخة تستخدم localStorage بالمفتاح <b>nut.works.v1</b> لتكون متوافقة مع نظام الأعمال الموجود حاليًا. عند وضع admin.html بجانب index.html على نفس نطاق GitHub Pages سيشتركان في التخزين نفسه على نفس المتصفح.</p>
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+const WORK_KEY="nut.works.v1";
+const AR_PRESETS=[["3/4","٣:٤"],["1/1","١:١"],["16/9","١٦:٩"],["4/5","٤:٥"],["9/16","٩:١٦"]];
+const DEFAULT_WORKS=[
+        { id:"w1", seed:"nut-granada", year:"2025",
+          en:{ name:"Granada", cat:"Identity · Menu · Content",
+               lede:"A restaurant loved on its street, invisible one block over.",
+               ch:[["01","Challenge","The identity changed every year with a different designer, so nothing stuck."],
+                   ["02","Idea","Instead of a new logo we built a system: one colour, one typeface, one way to shoot a dish."],
+                   ["03","Execution","Full identity, menu redesign, a photography system, and a guide the team can run without us."],
+                   ["04","Impact","Ninety days, same ad budget."]],
+               res:[["184%","Engagement"],["72%","Reach"],["2.4x","Visits"]] },
+          ar:{ name:"غرناطة", cat:"هوية · قائمة · محتوى",
+               lede:"مطعم يعرفه شارعه، ولا أحد يعرفه بعد الشارع.",
+               ch:[["٠١","التحدي","الهوية تتغير كل سنة مع مصمم مختلف، فما بقي شي يُتذكر."],
+                   ["٠٢","الفكرة","بدل شعار جديد، بنينا نظامًا: لون واحد، خط واحد، وطريقة واحدة لتصوير الطبق."],
+                   ["٠٣","التنفيذ","هوية كاملة، إعادة تصميم القائمة، نظام تصوير، ودليل يقدر الفريق يشتغل عليه بدوننا."],
+                   ["٠٤","الأثر","تسعين يوم، وبنفس الميزانية الإعلانية."]],
+               res:[["١٨٤٪","تفاعل"],["٧٢٪","وصول"],["٢٫٤x","زيارات"]] } },
+        { id:"w2", seed:"nut-mirwad", year:"2025",
+          en:{ name:"Mirwad", cat:"Launch · Packaging · Campaign",
+               lede:"Specialty coffee competing on shelf price instead of story.",
+               ch:[["01","Challenge","An excellent product in a crowded market with nothing but price to set it apart."],
+                   ["02","Idea","Packaging that tells the farm: altitude, season, the grower's name."],
+                   ["03","Execution","Six packaging variants, a shoot at the farm, a three-week launch."],
+                   ["04","Impact","More telling than sales: how many came back."]],
+               res:[["3.4x","Sales"],["210%","Followers"],["41%","Returning"]] },
+          ar:{ name:"مِرْوَد", cat:"إطلاق · تغليف · حملة",
+               lede:"قهوة مختصة تنافس على الرف بالسعر بدل القصة.",
+               ch:[["٠١","التحدي","منتج ممتاز في سوق مزدحم، وما فيه شي يفرّقه غير السعر."],
+                   ["٠٢","الفكرة","تغليف يحكي المزرعة: الارتفاع، الموسم، واسم المزارع."],
+                   ["٠٣","التنفيذ","ست نسخ تغليف، جلسة تصوير في المزرعة، وحملة إطلاق على ثلاثة أسابيع."],
+                   ["٠٤","الأثر","والأهم من المبيعات: كم واحد رجع يشتري مرة ثانية."]],
+               res:[["٣٫٤x","مبيعات"],["٢١٠٪","متابعين"],["٤١٪","عائدون"]] } },
+        { id:"w3", seed:"nut-safi", year:"2024",
+          en:{ name:"Safi", cat:"Identity · Digital",
+               lede:"A clinic where the patient is anxious before the door opens.",
+               ch:[["01","Challenge","Every clinic uses the same language: blue, smiles, promises."],
+                   ["02","Idea","We designed the identity to lower anxiety, not to display expertise."],
+                   ["03","Execution","Full identity, three-step booking, content explaining the procedure beforehand."],
+                   ["04","Impact","The site started convincing instead of the ads."]],
+               res:[["96%","Bookings"],["38%","Lower CAC"],["4.9","Rating"]] },
+          ar:{ name:"صافي", cat:"هوية · تجربة رقمية",
+               lede:"عيادة، والمريض متوتر قبل ما يفتح الباب.",
+               ch:[["٠١","التحدي","كل العيادات تستخدم نفس اللغة: أزرق، ابتسامات، ووعود."],
+                   ["٠٢","الفكرة","صممنا الهوية لتقليل التوتر، لا لعرض الاحترافية."],
+                   ["٠٣","التنفيذ","هوية كاملة، حجز في ثلاث خطوات، ومحتوى يشرح الإجراء قبل الموعد."],
+                   ["٠٤","الأثر","الموقع صار يقنع بدل الإعلان."]],
+               res:[["٩٦٪","حجوزات"],["٣٨٪","خفض تكلفة"],["٤٫٩","تقييم"]] } },
+        { id:"w4", seed:"nut-waqd", year:"2024",
+          en:{ name:"Waqd", cat:"Seasonal campaign",
+               lede:"A launch in a crowded season on a tenth of the budget.",
+               ch:[["01","Challenge","Launching against competitors outspending us ten to one."],
+                   ["02","Idea","One idea executed at every touchpoint instead of ten average ones."],
+                   ["03","Execution","One film, one visual system, three platforms. Nothing else."],
+                   ["04","Impact","Focus outperformed spend."]],
+               res:[["12M","Impressions"],["58%","Brand recall"],["6.1x","Return"]] },
+          ar:{ name:"وَقْد", cat:"حملة موسمية",
+               lede:"إطلاق في موسم مزدحم بعُشر ميزانية المنافسين.",
+               ch:[["٠١","التحدي","نطلق مقابل منافسين ينفقون عشرة أضعافنا."],
+                   ["٠٢","الفكرة","فكرة واحدة تُنفَّذ في كل نقطة تماس، بدل عشر أفكار متوسطة."],
+                   ["٠٣","التنفيذ","فيلم واحد، نظام بصري واحد، وثلاث منصات. ولا شي غيرها."],
+                   ["٠٤","الأثر","التركيز غلب الإنفاق."]],
+               res:[["١٢M","انطباع"],["٥٨٪","استرجاع علامة"],["٦٫١x","عائد"]] } }
+      ];
+const FIT=()=>({z:1,x:50,y:50,ar:"3/4"});
+const NEW=()=>({id:"w"+Date.now().toString(36),seed:"nut-"+Math.random().toString(36).slice(2,7),year:new Date().getFullYear().toString(),cover:"",fit:FIT(),shots:["",""],fits:[FIT(),FIT()],audio:"",ar:{name:"مشروع جديد",cat:"التصنيف",lede:"جملة تلخّص المشروع.",ch:[["٠١","التحدي",""],["٠٢","الفكرة",""],["٠٣","التنفيذ",""],["٠٤","الأثر",""]],res:[["",""],["",""],["",""]]},en:{name:"New project",cat:"Category",lede:"One line that frames the project.",ch:[["01","Challenge",""],["02","Idea",""],["03","Execution",""],["04","Impact",""]],res:[["",""],["",""],["",""]]}});
+
+function normalise(list){
+  list.forEach(w=>{
+    w.fit=Object.assign(FIT(),w.fit||{});
+    w.shots=w.shots||["",""];
+    w.fits=(w.fits||[]).map(f=>Object.assign(FIT(),f||{}));
+    while(w.fits.length<2)w.fits.push(FIT());
+    w.audio=w.audio||"";
+    w.ar=w.ar||NEW().ar; w.en=w.en||NEW().en;
+  });
+  return list;
+}
+function load(){
+  try{const p=JSON.parse(localStorage.getItem(WORK_KEY)||"null");if(Array.isArray(p)&&p.length)return normalise(p)}catch(e){}
+  return normalise(structuredClone(DEFAULT_WORKS));
+}
+let LIVE=load();
+let dragIndex=null, mediaTarget=null;
+
+function esc(s){return String(s??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+function isVid(u){return typeof u==="string"&&(/^data:video/.test(u)||/\.(mp4|webm|mov)$/i.test(u))}
+function fitOf(w,slot){return slot==="cover"?w.fit:w.fits[+slot]}
+function toast(m){const t=document.getElementById("toast");t.textContent=m;t.classList.add("on");clearTimeout(t._t);t._t=setTimeout(()=>t.classList.remove("on"),1800)}
+function persist(){try{localStorage.setItem(WORK_KEY,JSON.stringify(LIVE));document.getElementById("status").textContent="آخر حفظ: "+new Date().toLocaleTimeString();toast("تم حفظ التغييرات");return true}catch(e){alert("تعذر الحفظ. مساحة التخزين ممتلئة، خصوصًا مع الفيديو.");return false}}
+
+function mediaHTML(src,fit){
+  if(!src)return '<div style="padding:20px">اسحب صورة/فيديو هنا<br>أو اضغط للاختيار</div>';
+  const f=Object.assign(FIT(),fit||{});
+  const st=`object-position:${f.x}% ${f.y}%;transform:scale(${f.z})`;
+  return isVid(src)?`<video src="${src}" autoplay muted loop playsinline style="${st}"></video>`:`<img src="${src}" alt="" style="${st}">`;
+}
+function mediaCard(i,slot,label){
+  const w=LIVE[i],src=slot==="cover"?w.cover:w.shots[+slot],f=fitOf(w,slot);
+  return `<div class="media-card">
+    <div class="media-label">${label}</div>
+    <div class="drop ${src?"has":""}" data-media data-i="${i}" data-slot="${slot}" style="aspect-ratio:${ratioValue(f.ar)}">
+      ${mediaHTML(src,f)}${src?'<button class="clear" data-clear>×</button>':""}
+    </div>
+    <div class="ratio">${AR_PRESETS.map(x=>`<button class="${f.ar===x[0]?"on":""}" data-ar="${x[0]}" data-i="${i}" data-slot="${slot}">${x[1]}</button>`).join("")}</div>
+    ${src?`<div class="zoom">تكبير <input type="range" min="1" max="2.6" step=".02" value="${f.z}" data-zoom data-i="${i}" data-slot="${slot}"><span>${Math.round(f.z*100)}%</span></div>`:""}
+  </div>`;
+}
+function ratioValue(ar){return ar==="1/1"?"1":ar==="16/9"?"16/9":ar==="4/5"?"4/5":ar==="9/16"?"9/16":"3/4"}
+
+function render(){
+  const list=document.getElementById("list");
+  if(!LIVE.length){list.innerHTML='<div class="empty">لا توجد أعمال. اضغط «إضافة عمل» للبدء.</div>';return}
+  list.innerHTML=LIVE.map((w,i)=>`<article class="project" data-i="${i}">
+    <div class="project-head">
+      <span class="grip" draggable="true">⠿</span>
+      <div class="thumb">${w.cover?mediaHTML(w.cover,w.fit):"—"}</div>
+      <div class="head-title"><strong>${esc(w.ar.name)} · ${esc(w.en.name)}</strong><small>${esc(w.ar.cat)} · ${esc(w.year)}</small></div>
+      <div class="head-actions"><button class="btn danger" data-del>حذف</button><button class="btn" data-toggle>تحرير</button></div>
+    </div>
+    <div class="body">
+      <div class="grid">
+        <div class="field"><label>السنة</label><input data-f="year" value="${esc(w.year)}"></div>
+        <div></div>
+      </div>
+      <div class="section"><h3>الوسائط</h3><div class="media-grid">
+        ${mediaCard(i,"cover","الغلاف")}
+        ${mediaCard(i,"0","داخلية ١")}
+        ${mediaCard(i,"1","داخلية ٢")}
+      </div></div>
+      ${["ar","en"].map(L=>`<div class="section">
+        <div class="lang-tabs"><button class="on">${L==="ar"?"العربية":"English"}</button></div>
+        <div class="grid">
+          <div class="field"><label>${L==="ar"?"الاسم":"Name"}</label><input data-l="${L}" data-f="name" value="${esc(w[L].name)}"></div>
+          <div class="field"><label>${L==="ar"?"التصنيف":"Category"}</label><input data-l="${L}" data-f="cat" value="${esc(w[L].cat)}"></div>
+        </div>
+        <div class="field" style="margin-top:12px"><label>${L==="ar"?"الجملة الافتتاحية":"Lede"}</label><textarea data-l="${L}" data-f="lede">${esc(w[L].lede)}</textarea></div>
+        <div class="grid" style="margin-top:12px">
+          ${w[L].ch.map((c,ci)=>`<div class="field"><label>${c[0]} — ${L==="ar"?"الفصل":"Chapter"}</label><input data-l="${L}" data-ch="${ci}" data-k="1" value="${esc(c[1])}"><textarea style="margin-top:7px" data-l="${L}" data-ch="${ci}" data-k="2">${esc(c[2])}</textarea></div>`).join("")}
+        </div>
+        <div class="grid" style="margin-top:12px">
+          ${w[L].res.map((r,ri)=>`<div class="field"><label>${L==="ar"?"نتيجة":"Result"} ${ri+1}</label><input data-l="${L}" data-res="${ri}" data-k="0" value="${esc(r[0])}" placeholder="184%"><input style="margin-top:7px" data-l="${L}" data-res="${ri}" data-k="1" value="${esc(r[1])}" placeholder="${L==="ar"?"الوصف":"Label"}"></div>`).join("")}
+        </div>
+      </div>`).join("")}
+    </div>
+  </article>`).join("");
+  bind();
+}
+function bind(){
+  document.querySelectorAll(".project").forEach(el=>{
+    const i=+el.dataset.i,w=LIVE[i];
+    el.querySelector("[data-toggle]").onclick=()=>el.classList.toggle("open");
+    el.querySelector("[data-del]").onclick=()=>{if(confirm("حذف هذا العمل؟")){LIVE.splice(i,1);render();toast("تم الحذف — اضغط حفظ التغييرات")}};
+    el.querySelectorAll("input,textarea").forEach(f=>f.oninput=()=>{
+      const L=f.dataset.l;
+      if(f.dataset.ch!==undefined)w[L].ch[+f.dataset.ch][+f.dataset.k]=f.value;
+      else if(f.dataset.res!==undefined)w[L].res[+f.dataset.res][+f.dataset.k]=f.value;
+      else if(L)w[L][f.dataset.f]=f.value; else w[f.dataset.f]=f.value;
+    });
+    const g=el.querySelector(".grip");
+    g.ondragstart=()=>{dragIndex=i};
+    el.ondragover=e=>{if(dragIndex!==null)e.preventDefault()};
+    el.ondrop=e=>{e.preventDefault();if(dragIndex===null)return;const[m]=LIVE.splice(dragIndex,1);LIVE.splice(i,0,m);dragIndex=null;render();toast("تم تغيير الترتيب — اضغط حفظ")};
+  });
+  document.querySelectorAll("[data-media]").forEach(d=>{
+    const i=+d.dataset.i,slot=d.dataset.slot;
+    d.onclick=e=>{
+      if(e.target.closest("[data-clear]"))return;
+      mediaTarget={i,slot};const p=document.createElement("input");p.type="file";p.accept="image/*,video/*";p.onchange=()=>{const f=p.files[0];if(f)readFile(f,url=>{setMedia(i,slot,url);render();toast("تم تحديث الوسائط — اضغط حفظ")})};p.click();
+    };
+    let dragging=false,sx=0,sy=0,bx=50,by=50;
+    d.onpointerdown=e=>{
+      if(!d.classList.contains("has")||e.target.closest("[data-clear]"))return;
+      const f=fitOf(LIVE[i],slot);dragging=true;sx=e.clientX;sy=e.clientY;bx=f.x;by=f.y;d.setPointerCapture(e.pointerId);
+    };
+    d.onpointermove=e=>{if(!dragging)return;const f=fitOf(LIVE[i],slot);f.x=Math.max(0,Math.min(100,bx-(e.clientX-sx)*.35));f.y=Math.max(0,Math.min(100,by-(e.clientY-sy)*.35));const m=d.querySelector("img,video");if(m)m.style.objectPosition=`${f.x}% ${f.y}%`};
+    d.onpointerup=()=>dragging=false;
+    d.querySelector("[data-clear]")?.addEventListener("click",e=>{e.stopPropagation();setMedia(i,slot,"");render()});
+  });
+  document.querySelectorAll("[data-zoom]").forEach(r=>r.oninput=()=>{const f=fitOf(LIVE[+r.dataset.i],r.dataset.slot);f.z=+r.value;const d=document.querySelector(`.drop[data-i="${r.dataset.i}"][data-slot="${r.dataset.slot}"]`);const m=d?.querySelector("img,video");if(m)m.style.transform=`scale(${f.z})`;r.nextElementSibling.textContent=Math.round(f.z*100)+"%"});
+  document.querySelectorAll("[data-ar]").forEach(b=>b.onclick=()=>{fitOf(LIVE[+b.dataset.i],b.dataset.slot).ar=b.dataset.ar;render()});
+}
+function setMedia(i,slot,url){const w=LIVE[i];if(slot==="cover")w.cover=url;else w.shots[+slot]=url}
+function readFile(file,cb){
+  if(file.size>14*1024*1024){alert("الملف أكبر من 14MB. صغّره أولًا.");return}
+  const r=new FileReader();r.onload=()=>cb(r.result);r.readAsDataURL(file)
+}
+
+document.getElementById("addBtn").onclick=()=>{LIVE.push(NEW());render();document.querySelectorAll(".project")[LIVE.length-1]?.classList.add("open");toast("تمت إضافة عمل")};
+document.getElementById("saveBtn").onclick=persist;
+document.getElementById("openSite").onclick=()=>location.href="index.html";
+document.getElementById("exportBtn").onclick=()=>{const b=new Blob([JSON.stringify(LIVE,null,2)],{type:"application/json"});const a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="nut-works.json";a.click();URL.revokeObjectURL(a.href)};
+document.getElementById("importBtn").onclick=()=>document.getElementById("jsonFile").click();
+document.getElementById("jsonFile").onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const p=JSON.parse(r.result);if(!Array.isArray(p))throw 0;LIVE=normalise(p);render();toast("تم الاستيراد — اضغط حفظ التغييرات")}catch(err){alert("ملف JSON غير صالح")}};r.readAsText(f);e.target.value=""};
+window.addEventListener("storage",e=>{if(e.key===WORK_KEY){LIVE=load();render();toast("تم تحديث البيانات من الموقع")}});
+
+render();
+document.getElementById("status").textContent="المشاريع: "+LIVE.length;
+</script>
+
+<script>
+(function(){
+  const CMS_KEY="nut.site.v1";
+  const fonts=["Thmanyah Sans","Noto Kufi Arabic","Inter","DM Sans","Manrope","Archivo","Montserrat","Poppins","Space Grotesk","Bricolage Grotesque","Playfair Display","DM Serif Display","Cormorant Garamond","Libre Baskerville","Merriweather","Source Sans 3","Work Sans","Arial","Helvetica Neue","Georgia","Times New Roman"];
+  const copyDefaults={
+    home:[
+      {id:"work-eyebrow",type:"text",text:{ar:"NUT. / إشارات في الثقافة",en:"NUT. / Signals in culture"},style:{size:12,weight:500,align:"center",font:"ui",visible:true}},
+      {id:"work-title",type:"heading",text:{ar:"أفكار لها نبض.",en:"Ideas with a pulse."},style:{size:64,weight:600,align:"center",font:"heading",visible:true}},
+      {id:"work-description",type:"text",text:{ar:"هويات، عوالم رقمية، وتجارب تترك أثرًا.",en:"Identity, digital worlds, and experiments with a pulse."},style:{size:16,weight:400,align:"center",font:"body",visible:true}},
+      {id:"work-link",type:"button",text:{ar:"اكتشف أعمالنا",en:"Explore the work"},style:{size:12,weight:600,align:"center",font:"ui",visible:true}},
+      {id:"object-caption",type:"text",text:{ar:"شيء للعقول الفضولية",en:"An object for curious minds"},style:{size:11,weight:400,align:"center",font:"ui",visible:true}}
+    ],
+    work:[
+      {id:"work-title",type:"heading",text:{ar:"أعمالنا",en:"Work"},style:{size:54,weight:600,align:"left",font:"heading",visible:true}},
+      {id:"work-note",type:"text",text:{ar:"مشاريع صنعت فرقًا.",en:"Projects with a pulse."},style:{size:15,weight:400,align:"left",font:"body",visible:true}}
+    ],
+    about:[
+      {id:"about-eyebrow",type:"text",text:{ar:"عن NUT.",en:"About NUT."},style:{size:12,weight:500,align:"left",font:"ui",visible:true}},
+      {id:"about-title",type:"heading",text:{ar:"نصنع أفكارًا لها نبض.",en:"We build ideas with a pulse."},style:{size:52,weight:600,align:"left",font:"heading",visible:true}},
+      {id:"about-copy",type:"text",text:{ar:"استوديو إبداعي يعمل على الهوية، العوالم الرقمية والتجارب.",en:"A creative studio working across identity, digital worlds and experiments."},style:{size:16,weight:400,align:"left",font:"body",visible:true}}
+    ],
+    contact:[
+      {id:"contact-eyebrow",type:"text",text:{ar:"تواصل معنا",en:"Contact"},style:{size:12,weight:500,align:"left",font:"ui",visible:true}},
+      {id:"contact-title",type:"heading",text:{ar:"لنبنِ شيئًا.",en:"Let's build something."},style:{size:58,weight:600,align:"left",font:"heading",visible:true}},
+      {id:"contact-copy",type:"text",text:{ar:"الرياض · في كل مكان",en:"Riyadh · Everywhere"},style:{size:15,weight:400,align:"left",font:"body",visible:true}},
+      {id:"contact-mail",type:"button",text:{ar:"راسلنا",en:"Email us"},style:{size:12,weight:600,align:"left",font:"ui",visible:true}}
+    ]
+  };
+  const defaults={version:2,language:"ar",theme:{acid:"#d7ff3f",bg:"#0a0a0a",text:"#f7f7f2",muted:"#8a8a84"},fonts:{heading:"Thmanyah Sans",body:"Thmanyah Sans",ui:"Thmanyah Sans",ar:"Thmanyah Sans"},brand:{logoText:"NUT",logoSrc:"",logoDot:"#d7ff3f"},header:{ar:"NUT.",en:"NUT.",workAr:"أعمالنا",workEn:"WORK"},footer:{ar:"NUT. — استوديو إبداعي",en:"NUT. — Creative Studio"},media:{objectFit:"cover",defaultRatio:"3/4"},controls:{buttonBorderWidth:1,buttonBorderWidthLight:1.5},pages:copyDefaults};
+  let state=loadState(), currentPage="home", selectedId=null, dragFrom=null;
+
+  function clone(o){return JSON.parse(JSON.stringify(o))}
+  function loadState(){try{const x=JSON.parse(localStorage.getItem(CMS_KEY)||"null");if(x&&x.pages)return mergeDefaults(x)}catch(e){}return clone(defaults)}
+  function mergeDefaults(x){
+    const d=clone(defaults);Object.assign(d,x);d.theme=Object.assign(d.theme,x.theme||{});d.fonts=Object.assign(d.fonts,x.fonts||{});
+    d.brand=Object.assign(d.brand,x.brand||{});d.header=Object.assign(d.header,x.header||{});d.footer=Object.assign(d.footer,x.footer||{});d.media=Object.assign(d.media,x.media||{});
+    d.pages=Object.assign(d.pages,x.pages||{});Object.keys(copyDefaults).forEach(k=>{if(!Array.isArray(d.pages[k]))d.pages[k]=clone(copyDefaults[k])});
+    return d;
+  }
+  function saveState(){localStorage.setItem(CMS_KEY,JSON.stringify(state));document.documentElement.style.setProperty("--nut-accent",state.theme.acid);document.documentElement.style.setProperty("--nut-bg",state.theme.bg);renderSummary();flash("تم حفظ إعدادات الموقع")}
+  function flash(t){if(typeof aToast==="function")aToast(t);else alert(t)}
+  function esc(v){return String(v??"").replace(/[&<>"]/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]))}
+  function fontValue(key){return key==="heading"?state.fonts.heading:key==="body"?state.fonts.body:key==="ar"?state.fonts.ar:state.fonts.ui}
+  function styleBlock(b){
+    const st=b.style||{}, font=fontValue(st.font||"body");
+    return `font-family:${esc(font)},sans-serif;font-size:${+st.size||16}px;font-weight:${+st.weight||400};text-align:${st.align||"left"};display:${st.visible===false?"none":"block"};`;
+  }
+  function textFor(b){return b.text?.[state.language==="ar"?"ar":"en"]??b.text?.en??""}
+  function renderBlocks(){
+    const box=document.getElementById("cmsBlocks"), blocks=state.pages[currentPage]||[];
+    if(!blocks.length){box.innerHTML='<div class="cms-empty">لا توجد عناصر. أضف عنوانًا أو نصًا أو صورة.</div>';return}
+    box.innerHTML=blocks.map((b,i)=>{
+      let content="";
+      if(b.type==="heading")content=`<div class="cms-preview-title" style="${styleBlock(b)}">${esc(textFor(b))}</div>`;
+      else if(b.type==="text")content=`<div class="cms-preview-copy" style="${styleBlock(b)}">${esc(textFor(b))}</div>`;
+      else if(b.type==="button")content=`<div style="${styleBlock(b)}"><span class="cms-preview-btn">${esc(textFor(b))}</span></div>`;
+      else if(b.type==="image")content=`<div style="${styleBlock(b)}"><div class="cms-media-frame" data-media-block="${esc(b.id)}" style="aspect-ratio:${esc(b.ratio||state.media.defaultRatio)}">${b.src?`<img src="${esc(b.src)}" style="object-fit:${esc(b.objectFit||state.media.objectFit)};object-position:${+b.x||50}% ${+b.y||50}%;transform:scale(${+b.zoom||1})">`:'<div class="media-empty">اسحب صورة هنا أو اضغط لتحريرها</div>'}</div></div>`;
+      else if(b.type==="spacer")content=`<div style="height:${+b.height||70}px"></div>`;
+      else content=`<div style="height:1px;background:${state.theme.muted};opacity:.35"></div>`;
+      return `<div class="cms-block ${b.style?.visible===false?"hidden":""} ${selectedId===b.id?"selected":""}" draggable="true" data-id="${esc(b.id)}">
+        <div class="cms-block-head"><span class="cms-drag">⠿</span><span class="cms-kind">${b.type.toUpperCase()}</span><small>${i+1}</small></div>${content}</div>`;
+    }).join("");
+    bindBlockEvents();
+  }
+  function bindBlockEvents(){
+    document.querySelectorAll(".cms-block").forEach(el=>{
+      el.addEventListener("click",()=>{selectedId=el.dataset.id;renderBlocks();renderInspector()});
+      el.addEventListener("dragstart",e=>{dragFrom=(state.pages[currentPage]||[]).findIndex(x=>x.id===el.dataset.id);e.dataTransfer.effectAllowed="move"});
+      el.addEventListener("dragover",e=>e.preventDefault());
+      el.addEventListener("drop",e=>{e.preventDefault();const arr=state.pages[currentPage];const to=arr.findIndex(x=>x.id===el.dataset.id);if(dragFrom>=0&&to>=0&&dragFrom!==to){const [m]=arr.splice(dragFrom,1);arr.splice(to,0,m);selectedId=m.id;renderBlocks();renderInspector();saveState()}dragFrom=null});
+    });
+  }
+  function selected(){return (state.pages[currentPage]||[]).find(x=>x.id===selectedId)}
+  function renderInspector(){
+    const b=selected(), box=document.getElementById("cmsInspector");
+    if(!b){box.innerHTML='<div class="cms-empty">اختر عنصرًا من الصفحة.</div>';return}
+    const st=b.style||{}, ar=b.text?.ar??"", en=b.text?.en??"";
+    box.innerHTML=`
+      <div class="cms-field"><label>نوع العنصر</label><select id="ciType"><option ${b.type==="heading"?"selected":""}>heading</option><option ${b.type==="text"?"selected":""}>text</option><option ${b.type==="button"?"selected":""}>button</option><option ${b.type==="image"?"selected":""}>image</option><option ${b.type==="spacer"?"selected":""}>spacer</option><option ${b.type==="divider"?"selected":""}>divider</option></select></div>
+      ${b.type!=="spacer"&&b.type!=="divider"?`
+      <div class="cms-field"><label>النص العربي</label><textarea id="ciAr">${esc(ar)}</textarea></div>
+      <div class="cms-field"><label>English text</label><textarea id="ciEn">${esc(en)}</textarea></div>`:""}
+      ${b.type==="image"?`<div class="cms-media-editor">
+        <div class="cms-field"><label>رابط الصورة / Data URL</label><input id="ciSrc" value="${esc(b.src||"")}"></div>
+        <div class="cms-actions"><button id="ciPick">رفع صورة</button></div>
+        <div class="cms-drop-zone" id="ciDrop">اسحب الصورة وأسقطها هنا</div>
+        <div class="cms-field"><label>طريقة الملاءمة</label><select id="ciFit"><option ${b.objectFit==="cover"||!b.objectFit?"selected":""}>cover</option><option ${b.objectFit==="contain"?"selected":""}>contain</option><option ${b.objectFit==="fill"?"selected":""}>fill</option><option ${b.objectFit==="none"?"selected":""}>none</option><option ${b.objectFit==="scale-down"?"selected":""}>scale-down</option></select></div>
+        <div class="cms-field"><label>نسبة الإطار</label><div class="cms-frame-controls">${["3/4","1/1","16/9","4/5","9/16"].map(r=>`<button type="button" class="${(b.ratio||state.media.defaultRatio)===r?"on":""}" data-ratio="${r}">${r}</button>`).join("")}</div></div>
+        <div class="cms-media-tools">
+          <div class="cms-field"><label>تكبير</label><input id="ciZoom" type="range" min="1" max="3" step=".01" value="${+b.zoom||1}"></div>
+          <div class="cms-field"><label>موضع أفقي %</label><input id="ciX" type="range" min="0" max="100" value="${+b.x||50}"></div>
+          <div class="cms-field"><label>موضع رأسي %</label><input id="ciY" type="range" min="0" max="100" value="${+b.y||50}"></div>
+        </div>
+      </div>`:""}
+      ${b.type==="spacer"?`<div class="cms-field"><label>الارتفاع</label><input id="ciHeight" type="number" value="${+b.height||70}"></div>`:""}
+      ${b.type!=="divider"&&b.type!=="image"&&b.type!=="spacer"?`<div class="cms-field"><label>عائلة الخط</label><select id="ciFont"><option value="heading">خط العناوين</option><option value="body">خط النصوص</option><option value="ui">خط الواجهة</option><option value="ar">الخط العربي</option></select></div>`:""}
+      <div class="cms-two">
+        <div class="cms-field"><label>الحجم px</label><input id="ciSize" type="number" min="8" max="180" value="${+st.size||16}"></div>
+        <div class="cms-field"><label>الوزن</label><select id="ciWeight"><option ${+st.weight===300?"selected":""}>300</option><option ${+st.weight===400||!st.weight?"selected":""}>400</option><option ${+st.weight===500?"selected":""}>500</option><option ${+st.weight===600?"selected":""}>600</option><option ${+st.weight===700?"selected":""}>700</option></select></div>
+      </div>
+      <div class="cms-field"><label>المحاذاة</label><select id="ciAlign"><option ${st.align==="left"?"selected":""}>left</option><option ${st.align==="center"?"selected":""}>center</option><option ${st.align==="right"?"selected":""}>right</option></select></div>
+      <label class="cms-check"><input id="ciVisible" type="checkbox" ${st.visible!==false?"checked":""}> إظهار العنصر</label>
+      <div class="cms-actions"><button class="primary" id="ciApply">تطبيق</button><button id="ciDuplicate">نسخ</button><button id="ciDelete">حذف</button></div>`;
+    const fontSel=document.getElementById("ciFont");if(fontSel)fontSel.value=st.font||"body";
+    document.getElementById("ciApply").onclick=()=>{
+      b.style=Object.assign({},b.style,{size:+document.getElementById("ciSize").value,weight:+document.getElementById("ciWeight").value,align:document.getElementById("ciAlign").value,visible:document.getElementById("ciVisible").checked,font:fontSel?.value||st.font||"body"});
+      if(b.text){b.text.ar=document.getElementById("ciAr").value;b.text.en=document.getElementById("ciEn").value}
+      if(b.type==="spacer")b.height=+document.getElementById("ciHeight").value;
+      if(b.type==="image"){
+        b.src=document.getElementById("ciSrc").value;b.objectFit=document.getElementById("ciFit").value;b.zoom=+document.getElementById("ciZoom").value;b.x=+document.getElementById("ciX").value;b.y=+document.getElementById("ciY").value;
+      }
+      renderBlocks();renderInspector();saveState();
+    };
+    document.getElementById("ciDelete").onclick=()=>{state.pages[currentPage]=state.pages[currentPage].filter(x=>x.id!==b.id);selectedId=null;renderBlocks();renderInspector();saveState()};
+    document.getElementById("ciDuplicate").onclick=()=>{const c=clone(b);c.id=b.id+"-"+Date.now().toString(36);state.pages[currentPage].splice(state.pages[currentPage].indexOf(b)+1,0,c);selectedId=c.id;renderBlocks();renderInspector();saveState()};
+    if(document.getElementById("ciPick"))document.getElementById("ciPick").onclick=()=>{const p=document.createElement("input");p.type="file";p.accept="image/*";p.onchange=()=>{const f=p.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{b.src=r.result;document.getElementById("ciSrc").value=r.result;renderBlocks();saveState()};r.readAsDataURL(f)};p.click()};
+    document.querySelectorAll("[data-ratio]").forEach(btn=>btn.onclick=()=>{b.ratio=btn.dataset.ratio;renderBlocks();renderInspector()});
+    const dz=document.getElementById("ciDrop");
+    if(dz){
+      ["dragenter","dragover"].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.add("drag")}));
+      ["dragleave","drop"].forEach(ev=>dz.addEventListener(ev,e=>{e.preventDefault();dz.classList.remove("drag")}));
+      dz.addEventListener("drop",e=>{const f=e.dataTransfer.files?.[0];if(!f||!f.type.startsWith("image/"))return;const r=new FileReader();r.onload=()=>{b.src=r.result;document.getElementById("ciSrc").value=r.result;renderBlocks();renderInspector();saveState()};r.readAsDataURL(f)});
+    }
+
+  }
+  function addBlock(type){
+    const b={id:"b"+Date.now().toString(36),type,style:{size:type==="heading"?48:16,weight:type==="heading"?600:400,align:"left",font:type==="heading"?"heading":"body",visible:true}};
+    if(["heading","text","button"].includes(type))b.text={ar:type==="heading"?"عنوان جديد":type==="button"?"زر جديد":"نص جديد",en:type==="heading"?"New heading":type==="button"?"New button":"New text"};
+    if(type==="image")b.src="";
+    if(type==="spacer")b.height=70;
+    state.pages[currentPage].push(b);selectedId=b.id;renderBlocks();renderInspector();saveState();
+  }
+  function populateFonts(){
+    ["cmsHeadFont","cmsBodyFont","cmsUiFont","cmsArFont"].forEach(id=>{
+      const s=document.getElementById(id);s.innerHTML=fonts.map(f=>`<option>${esc(f)}</option>`).join("");
+    });
+    document.getElementById("cmsHeadFont").value=state.fonts.heading;document.getElementById("cmsBodyFont").value=state.fonts.body;document.getElementById("cmsUiFont").value=state.fonts.ui;document.getElementById("cmsArFont").value=state.fonts.ar;
+    document.getElementById("cmsAcid").value=state.theme.acid;document.getElementById("cmsBg").value=state.theme.bg;document.getElementById("cmsText").value=state.theme.text;document.getElementById("cmsMuted").value=state.theme.muted;
+    document.getElementById("cmsAcidHex").textContent=state.theme.acid;
+    document.getElementById("cmsLogoText").value=state.brand.logoText||"NUT";document.getElementById("cmsLogoDot").value=state.brand.logoDot||state.theme.acid;document.getElementById("cmsLogoSrc").value=state.brand.logoSrc||"";
+    document.getElementById("cmsHeaderAr").value=state.header.ar||"NUT.";document.getElementById("cmsHeaderEn").value=state.header.en||"NUT.";
+    document.getElementById("cmsHeaderWorkAr").value=state.header.workAr||"أعمالنا";document.getElementById("cmsHeaderWorkEn").value=state.header.workEn||"WORK";
+    document.getElementById("cmsFooterAr").value=state.footer.ar||"";document.getElementById("cmsFooterEn").value=state.footer.en||"";
+    document.getElementById("cmsObjectFit").value=state.media.objectFit||"cover";document.getElementById("cmsDefaultRatio").value=state.media.defaultRatio||"3/4";document.getElementById("cmsBtnBorder").value=state.controls?.buttonBorderWidth??1;document.getElementById("cmsBtnBorderLight").value=state.controls?.buttonBorderWidthLight??1.5;
+    updateLogoPreview();
+  }
+  function updateLogoPreview(){
+    const box=document.getElementById("cmsLogoPreview"),src=state.brand.logoSrc||"";
+    if(src)box.innerHTML=`<img src="${esc(src)}" alt="NUT logo">`;
+    else box.innerHTML=`<div class="nut-word">${esc(state.brand.logoText||"NUT")}<span class="nut-dot" style="color:${esc(state.brand.logoDot||state.theme.acid)}">.</span></div>`;
+  }
+  function renderPreview(){
+    const p=document.getElementById("cmsPreview"), blocks=state.pages[currentPage]||[];
+    p.style.background=state.theme.bg;p.style.color=state.theme.text;p.style.setProperty("--cms-accent",state.theme.acid);
+    p.innerHTML=blocks.map(b=>{
+      if(b.style?.visible===false)return "";
+      const st=styleBlock(b);
+      if(b.type==="heading")return `<h2 style="${st}">${esc(textFor(b))}</h2>`;
+      if(b.type==="text")return `<p style="${st};max-width:65ch">${esc(textFor(b))}</p>`;
+      if(b.type==="button")return `<div style="${st}"><span class="cms-preview-btn">${esc(textFor(b))}</span></div>`;
+      if(b.type==="image")return b.src?`<img class="cms-preview-image" src="${esc(b.src)}">`:`<div class="cms-empty">صورة</div>`;
+      if(b.type==="spacer")return `<div style="height:${+b.height||70}px"></div>`;
+      return `<hr style="opacity:.25">`;
+    }).join("");
+  }
+  function renderSummary(){document.getElementById("cmsSummary").textContent=JSON.stringify({version:state.version,pages:Object.fromEntries(Object.entries(state.pages).map(([k,v])=>[k,v.length])),fonts:state.fonts,theme:state.theme,brand:state.brand,header:state.header,footer:state.footer,media:state.media,controls:state.controls},null,2)}
+  document.querySelectorAll("[data-cms-tab]").forEach(t=>t.onclick=()=>{document.querySelectorAll("[data-cms-tab]").forEach(x=>x.classList.remove("active"));document.querySelectorAll("[data-cms-pane]").forEach(x=>x.classList.remove("active"));t.classList.add("active");document.querySelector(`[data-cms-pane="${t.dataset.cmsTab}"]`).classList.add("active");if(t.dataset.cmsTab==="preview")renderPreview()});
+  document.querySelectorAll("[data-page]").forEach(p=>p.onclick=()=>{document.querySelectorAll("[data-page]").forEach(x=>x.classList.remove("active"));p.classList.add("active");currentPage=p.dataset.page;selectedId=null;renderBlocks();renderInspector();renderPreview()});
+  document.querySelectorAll("[data-add-block]").forEach(b=>b.onclick=()=>addBlock(b.dataset.addBlock));
+  document.getElementById("cmsSaveType").onclick=()=>{
+    state.fonts.heading=document.getElementById("cmsHeadFont").value;state.fonts.body=document.getElementById("cmsBodyFont").value;state.fonts.ui=document.getElementById("cmsUiFont").value;state.fonts.ar=document.getElementById("cmsArFont").value;
+    state.theme.acid=document.getElementById("cmsAcid").value;state.theme.bg=document.getElementById("cmsBg").value;state.theme.text=document.getElementById("cmsText").value;state.theme.muted=document.getElementById("cmsMuted").value;
+    state.brand.logoText=document.getElementById("cmsLogoText").value||"NUT";state.brand.logoDot=document.getElementById("cmsLogoDot").value||state.theme.acid;state.brand.logoSrc=document.getElementById("cmsLogoSrc").value||"";
+    state.header.ar=document.getElementById("cmsHeaderAr").value;state.header.en=document.getElementById("cmsHeaderEn").value;state.header.workAr=document.getElementById("cmsHeaderWorkAr").value;state.header.workEn=document.getElementById("cmsHeaderWorkEn").value;
+    state.footer.ar=document.getElementById("cmsFooterAr").value;state.footer.en=document.getElementById("cmsFooterEn").value;
+    state.media.objectFit=document.getElementById("cmsObjectFit").value;state.media.defaultRatio=document.getElementById("cmsDefaultRatio").value;state.controls=state.controls||{};state.controls.buttonBorderWidth=+document.getElementById("cmsBtnBorder").value;state.controls.buttonBorderWidthLight=+document.getElementById("cmsBtnBorderLight").value;
+    saveState();populateFonts();renderBlocks();renderPreview();
+  };
+  document.getElementById("cmsAcid").oninput=e=>{document.getElementById("cmsAcidHex").textContent=e.target.value;document.getElementById("cmsLogoDot").value=e.target.value;updateLogoPreview()};
+  document.getElementById("cmsLogoDot").oninput=updateLogoPreview;
+  document.getElementById("cmsLogoText").oninput=updateLogoPreview;
+  document.getElementById("cmsLogoSrc").oninput=updateLogoPreview;
+  document.getElementById("cmsLogoPick").onclick=()=>{const inp=document.createElement("input");inp.type="file";inp.accept="image/*";inp.onchange=()=>{const f=inp.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{document.getElementById("cmsLogoSrc").value=r.result;state.brand.logoSrc=r.result;updateLogoPreview()};r.readAsDataURL(f)};inp.click()};
+  document.getElementById("cmsLogoClear").onclick=()=>{document.getElementById("cmsLogoSrc").value="";state.brand.logoSrc="";updateLogoPreview()};
+
+  document.getElementById("cmsExport").onclick=()=>{const blob=new Blob([JSON.stringify(state,null,2)],{type:"application/json"}),a=document.createElement("a");a.href=URL.createObjectURL(blob);a.download="nut-site-config.json";a.click();URL.revokeObjectURL(a.href)};
+  document.getElementById("cmsImport").onclick=()=>document.getElementById("cmsJson").click();
+  document.getElementById("cmsJson").onchange=e=>{const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{state=mergeDefaults(JSON.parse(r.result));currentPage="home";selectedId=null;populateFonts();renderBlocks();renderInspector();renderSummary();flash("تم استيراد إعدادات الموقع")}catch(x){alert("ملف الإعدادات غير صالح")}};r.readAsText(f);e.target.value=""};
+  document.getElementById("cmsReset").onclick=()=>{if(confirm("إعادة CMS للوضع الافتراضي؟")){state=clone(defaults);currentPage="home";selectedId=null;saveState();populateFonts();renderBlocks();renderInspector();renderPreview()}};
+  populateFonts();renderBlocks();renderInspector();renderSummary();
+})();
+</script>
+
+</body>
+</html>
