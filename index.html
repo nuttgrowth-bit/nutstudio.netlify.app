@@ -1230,19 +1230,71 @@ html[dir="rtl"] *{
 
       let railMode = null;   // "work" | "about" | "contact" | null
 
-      /* ── محتوى الأعمال: من صفحة الأدمن إن وُجد، وإلا الافتراضي ── */
-      const WORK_KEY = "nut.works.v1";
-      let LIVE = WORKS;
+     /* ── WORKS DATA: works.json is the single source of truth ── */
+const WORK_KEY = "nut.works.v1";
 
-fetch('./works.json?v=' + Date.now(), { cache: 'no-store' })
-  .then(r => {
-    if (!r.ok) throw new Error('Works JSON failed: ' + r.status);
-    return r.json();
-  })
-  .then(data => {
-    if (Array.isArray(data) && data.length) {
-      LIVE = data;
-      if (railMode === "work") buildRail();
+/*
+  IMPORTANT:
+  The public Works section NEVER reads work data from localStorage.
+  works.json is the only source of truth.
+*/
+let LIVE = [];
+
+async function loadWorksFromJSON(){
+  try{
+    const response = await fetch("./works.json", {
+      cache: "no-store",
+      headers: {
+        "Accept": "application/json"
+      }
+    });
+
+    if(!response.ok) throw new Error("works.json HTTP " + response.status);
+
+    const data = await response.json();
+
+    if(!Array.isArray(data) || !data.length){
+      throw new Error("works.json is empty or invalid");
+    }
+
+    LIVE = data;
+
+    if(railMode === "work"){
+      buildRail();
+    }
+
+    if(typeof admRender === "function" && admEl && admEl.classList.contains("is-on")){
+      admRender();
+    }
+
+  }catch(err){
+    console.error("NUT Works: failed to load works.json", err);
+
+    /*
+      Do NOT fall back to localStorage.
+      Do NOT fall back to the old embedded WORKS array.
+      The external works.json remains the source of truth.
+    */
+    LIVE = [];
+
+    if(railMode === "work"){
+      buildRail();
+    }
+  }
+}
+
+/* Always load the published JSON file. */
+loadWorksFromJSON();
+
+/*
+  Ignore localStorage changes for the public Works section.
+  This prevents old admin data from replacing works.json.
+*/
+addEventListener("storage", e => {
+  if(e.key === WORK_KEY){
+    loadWorksFromJSON();
+  }
+});
     }
   })
   .catch(err => console.error('Works loading error:', err));
