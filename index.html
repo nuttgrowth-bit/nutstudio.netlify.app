@@ -1,6 +1,6 @@
 <!doctype html>
 <html lang="en"><head><script>window["__codeletBootstrap__"]=JSON.parse('{"A":"A","B":"20260813-05-b52571e","C":{"Abril Fatface":"YACgEZbkUVE,0","Alfa Slab One":"YACgEYS9sJU,0","Anton":"YACgEcYqQ-A,0","Archivo":"YAHO2-t-jNE,0","Arial":"YAGyDvJ_4Ts,0","Bebas Neue":"YACgESME5ew,0","Bricolage Grotesque":"YAFyMcdwzpc,0","Canva Sans":"YAFLd8sKbwc,2","Caveat":"YALBs2ploWQ,0","Comic Sans MS":"YAHO2VMiyZo,0","Cormorant Garamond":"YAFdJhX-538,0","Courier New":"YAGzXiGs0_8,0","DM Sans":"YAD1aU3sLnI,0","DM Serif Display":"YAD1aYG82rc,0","Forum":"YACgEcnnqB4,0","Fraunces":"YAEul-FRQw4,0","Georgia":"YAGzXkO0pEM,0","Helvetica Neue":"YAFcf6CtJfI,0","Impact":"YAFcfnjI7Vk,0","Inter":"YAFdJvSyp_k,3","Iowan Old Style":"YAGNIFa8j9o,0","Jacques Francois":"YAHO2a5g66Q,0","JetBrains Mono":"YAFdJksXcAk,0","Libre Baskerville":"YACgEUFdPdA,0","Manrope":"YAHO2b2feC4,0","Merriweather":"YACgEXvHxxs,0","Montserrat":"YADLjI9qxTA,0","Nunito":"YACgEX8C5Gg,0","Oleo Script":"YACgEQQ14jI,0","Phantom Sans":"YAHO2E8Pb88,0","Playfair Display":"YACgEYmuCJE,0","Poppins":"YAFdJjbTu24,1","Press Start 2P":"YAFyGr-8pmQ,0","Quicksand":"YADWjpfPmdk,0","Raleway":"YACgEVg3xZg,0","Segoe UI":"YAHNdRD1Klw,0","Source Sans 3":"YAG4lO1Mj10,0","Spectral":"YAHO2rVUHIM,0","Times New Roman":"YAGzXW3gftg,0","Times":"YAGzXW3gftg,0","Ubuntu":"YACgERDU--Q,0","Work Sans":"YAGXhLOKv44,0","Yellowtail":"YACgEYG4kG4,0","ui-monospace":"YADlN8CFZ8Q,0","ui-sans-serif":"YACkoN-xg4g,0"}}');</script><script src="/_sdk/7949ff62d67710d5.telemetry_sdk.js" integrity="sha512-KIvXA82Di44YY/RH9/63A9MuTuavYgDFG8PfErJn7Wli4K0LAOk+coo/aPXk3+ZNL96nHh9VYD4PE+fLes+laQ=="></script>
-  <!-- NUT-BUILD-2026-08-13-A -->
+  <!-- NUT-BUILD-2026-08-13-D -->
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>NUT. — Creative Studio</title>
@@ -484,7 +484,15 @@
 
 
     /* ═══════════ صفحة المشروع — بلوكات متتابعة (نمط Behance) ═══════════ */
-    .blk{margin:0 auto;padding:0 0 clamp(14px,2.2vw,26px)}
+    /* موضع الإطار داخل الصفحة: محاذاة + إزاحة أفقية ورأسية */
+    .blk{margin:0 auto;padding:0 0 clamp(14px,2.2vw,26px);
+      transform:translate(var(--dx,0%), var(--dy,0px))}
+    .blk[data-al="start"]{margin-inline:0 auto}
+    .blk[data-al="end"]{margin-inline:auto 0}
+    .blk[data-al="center"]{margin-inline:auto}
+    @media(max-width:700px){
+      .blk{transform:none;margin-inline:auto}   /* على الجوال: توسيط دائمًا */
+    }
     .blk-full{width:100%}
     .blk-wide{width:min(100%,1400px)}
     .blk-half{width:min(100%,760px)}
@@ -513,7 +521,8 @@
     /* مقابض توسيع/تضييق الإطار */
     .dz{width:var(--w,158px)}
     .hnd{position:absolute;z-index:5;background:transparent;border:0;padding:0;
-      opacity:0;transition:opacity .25s;touch-action:none}
+      opacity:0;pointer-events:none;transition:opacity .25s;touch-action:none}
+    .dz.has:hover .hnd,.dz.sizing .hnd{pointer-events:auto}
     .dz.has:hover .hnd,.dz.sizing .hnd{opacity:1}
     .hnd::before{content:"";position:absolute;inset:0;margin:auto;background:var(--acid);
       border-radius:99px;box-shadow:0 0 0 2px rgba(10,10,10,.5)}
@@ -534,8 +543,9 @@
     .dz.has::after{content:"";position:absolute;inset:0;z-index:2;pointer-events:none;
       box-shadow:inset 0 0 0 2px transparent;transition:box-shadow .25s}
     .dz.has:hover::after{box-shadow:inset 0 0 0 2px rgba(166,235,45,.55)}
-    .dz .zhint{position:absolute;bottom:5px;inset-inline-end:5px;z-index:3;
-      background:rgba(10,10,10,.72);color:#f7f7f2;font-size:9px;padding:2px 7px;
+    .dz .zhint{position:absolute;bottom:5px;inset-inline-end:5px;inset-inline-start:5px;z-index:3;
+      background:rgba(10,10,10,.72);color:#f7f7f2;font-size:8.5px;padding:3px 6px;text-align:center;
+      line-height:1.5;
       border-radius:4px;opacity:0;transition:opacity .3s;pointer-events:none}
     .dz.has:hover .zhint,.dz.zooming .zhint{opacity:1}
     /* بلوكات اللوحة */
@@ -545,6 +555,14 @@
     .brow.dragging{opacity:.4}
     .brow.over{border-color:var(--acid)}
     .brow .bgrip{cursor:grab;color:var(--muted);font-size:15px;padding:2px 4px}
+    .bmove{display:flex;gap:4px;flex:0 0 auto}
+    .bmove .ic{width:26px;height:26px;font-size:12px}
+    .nudge{display:grid;grid-template-columns:repeat(3,20px);grid-template-rows:repeat(3,18px);
+      gap:2px;margin-top:6px}
+    .nudge button{border:1px solid var(--hairline);background:none;color:inherit;font-size:10px;
+      border-radius:4px;cursor:pointer;padding:0;font-family:inherit;line-height:1}
+    .nudge button:hover{border-color:var(--acid);color:var(--acid)}
+    .nudge .mid{border-style:dashed;font-size:9px}
     .brow .bgrip:hover{color:var(--acid)}
     .brow .bth{width:52px;height:52px;border-radius:5px;overflow:hidden;background:rgba(127,127,127,.14);
       flex:0 0 auto;display:grid;place-items:center;font-size:9px;color:var(--muted);
@@ -558,6 +576,10 @@
       font-size:9.5px;padding:4px 7px;border-radius:5px;cursor:pointer;font-family:inherit}
     .brow .bws button.on{border-color:var(--acid);color:var(--acid)}
     .brow .bws button[data-bstep]{font-size:12px;padding:3px 7px;line-height:1}
+    .brow .bws button[data-bal]{font-size:10px;letter-spacing:-1px}
+    .brow .bws button.pad{cursor:move;touch-action:none;border-style:dashed}
+    .brow .bws button.pad.on{border-color:var(--acid);color:var(--acid);border-style:solid}
+    .brow .bws button.pad b{font-weight:400;opacity:.7;direction:ltr;display:inline-block}
     .brow .bar{position:absolute;bottom:-7px;inset-inline-start:-4px;z-index:4;
       background:rgba(10,10,10,.8);color:var(--acid);font-size:8.5px;padding:1px 5px;
       border-radius:4px;direction:ltr}
@@ -576,7 +598,8 @@
        ═══════════════════════════════════════════════════════════ */
 
     /* — cursor system: minimal dot, contextual — */
-    .cur-dot{position:fixed;top:0;left:0;z-index:90;width:8px;height:8px;border-radius:50%;
+    .cur-dot,.cur-lbl{display:none !important}
+    .cur-dot--unused{position:fixed;top:0;left:0;z-index:90;width:8px;height:8px;border-radius:50%;
       background:var(--acid);pointer-events:none;transform:translate(-50%,-50%);
       transition:width .45s cubic-bezier(.2,.8,.2,1),height .45s cubic-bezier(.2,.8,.2,1),
                  background .35s ease,opacity .3s ease;mix-blend-mode:normal}
@@ -588,9 +611,7 @@
       letter-spacing:.18em;text-transform:uppercase;opacity:0;transition:opacity .3s ease}
     .cur-lbl.is-on{opacity:1}
     @media (hover:none),(max-width:820px){.cur-dot,.cur-lbl{display:none}}
-    @media (hover:hover) and (min-width:821px){
-      body.has-cursor,body.has-cursor *{cursor:none !important}
-    }
+
 
     /* — the object: physics-driven wrapper — */
     .nut-field{will-change:transform}
@@ -790,7 +811,7 @@
 <button type="button" class="adm-open" id="admOpen">✎ لوحة الأعمال</button>
 <div class="adm" id="adm" role="dialog" aria-modal="true" aria-label="لوحة الأعمال">
   <div class="adm-top">
-    <h2>لوحة الأعمال · NUT-BUILD-2026-08-13-A</h2>
+    <h2>لوحة الأعمال · NUT-BUILD-2026-08-13-D</h2>
     <button class="ab" id="admAdd">+ عمل</button>
     <button class="ab" id="admExp">تصدير</button>
     <button class="ab" id="admImp">استيراد</button>
@@ -813,7 +834,7 @@
 <input type="file" id="admJson" accept="application/json,.json" hidden>
   <script src="/_sdk/9d3258af1f44fbf1.editing_sdk.js" integrity="sha512-3+HAndrk+HZiTGp2ISu+/bgYK1Xci+cLW89chzrkSCXjd9L9cNh/u9apmMgkep6XBKvCauldOAnZkyNhCjybeA=="></script>
   <script>
-    window.NUT_BUILD="NUT-BUILD-2026-08-13-A";
+    window.NUT_BUILD="NUT-BUILD-2026-08-13-D";
     console.log("%c"+window.NUT_BUILD,"background:#a6eb2d;color:#0a0a0a;padding:3px 8px;border-radius:4px");
     document.addEventListener("DOMContentLoaded", () => {
 
@@ -970,21 +991,13 @@
       };
 
       /* ---------- 1 · CURSOR ---------- */
+      /* المؤشر المخصص أُزيل — مؤشر النظام الافتراضي هو المستخدم */
       const curDot = document.createElement("div");
-      curDot.className = "cur-dot"; curDot.setAttribute("aria-hidden","true");
       const curLbl = document.createElement("div");
-      curLbl.className = "cur-lbl"; curLbl.setAttribute("aria-hidden","true");
-      document.body.append(curDot, curLbl);
       const cursor = { x:innerWidth/2, y:innerHeight/2, tx:innerWidth/2, ty:innerHeight/2,
                        vx:0, vy:0, ctx:"default" };
-      function setCtx(ctx,label){
-        if(cursor.ctx===ctx) return;
-        cursor.ctx = ctx;
-        curDot.dataset.ctx = ctx;
-        if(label){ curLbl.textContent = label; curLbl.classList.add("is-on"); }
-        else curLbl.classList.remove("is-on");
-      }
-      if(FINE.matches && !REDUCED.matches) document.body.classList.add("has-cursor");
+      function setCtx(){ /* لا مؤشر مخصص */ }
+      /* لا إخفاء لمؤشر النظام */
       addEventListener("pointermove", e => { cursor.tx = e.clientX; cursor.ty = e.clientY; },
         {passive:true});
 
@@ -1054,14 +1067,7 @@
         cursor.x += (cursor.tx - cursor.x) * .16;
         cursor.y += (cursor.ty - cursor.y) * .16;
         cursor.vx = cursor.x - px; cursor.vy = cursor.y - py;
-        if(FINE.matches){
-          const sp = clamp(Math.hypot(cursor.vx,cursor.vy)/40, 0, .18);
-          const a  = Math.atan2(cursor.vy,cursor.vx)*180/Math.PI;
-          curDot.style.transform =
-            `translate(${cursor.x}px, ${cursor.y}px) translate(-50%,-50%) ` +
-            `rotate(${a}deg) scale(${1+sp},${1-sp*.7}) rotate(${-a}deg)`;
-          curLbl.style.transform = `translate(${cursor.x}px, ${cursor.y}px) translate(-50%,-50%)`;
-        }
+
         try{ railFrame(); }catch(err){ /* frame-local, never abort the loop */ }
         requestAnimationFrame(loop);
       }
@@ -1424,6 +1430,8 @@
         const paint=()=>{
           const f=getFit(); const m=el.querySelector("img,video");
           if(m){ m.style.objectPosition=`${f.x}% ${f.y}%`; m.style.transform=`scale(${f.z})`; }
+          const lb=el.querySelector(".arlbl");
+          if(lb && mode) lb.textContent = Math.round(f.z*100)+"% · "+Math.round(f.x)+","+Math.round(f.y);
           onChange && onChange(f);
         };
         el.addEventListener("pointerdown",e=>{
@@ -1437,6 +1445,8 @@
           }else{
             const f=getFit();
             mode = (e.shiftKey || e.button===2) ? "zoom" : "pan";
+            /* بلا فائض لا يوجد ما يُحرَّك — نكبّر قليلًا ليصير للسحب أثر */
+            if(mode==="pan" && f.z < 1.12){ f.z = 1.12; paint(); }
             sx=e.clientX; sy=e.clientY; bx=f.x; by=f.y; bz=f.z; moved=0;
             el.classList.toggle("zooming", mode==="zoom");
           }
@@ -1453,7 +1463,7 @@
           }else if(mode==="zoom"){
             f.z=Math.max(1,Math.min(4, bz - (e.clientY-sy)*0.006));
           }else{
-            const k=0.34/f.z;
+            const k=0.55/Math.max(1,f.z);
             f.x=Math.max(0,Math.min(100, bx-(e.clientX-sx)*k));
             f.y=Math.max(0,Math.min(100, by-(e.clientY-sy)*k));
           }
@@ -1481,7 +1491,7 @@
       const BW = [["full","ملء العرض"],["wide","عريض"],["half","نصف"],["pair","زوجي"]];
       const BKIND = {image:"صورة / فيديو",text:"نص",quote:"اقتباس",space:"مسافة"};
       const NEWBLOCK = k => k==="image"
-        ? {k:"image",src:"",fit:FIT(),w:"wide",cap:""}
+        ? {k:"image",src:"",fit:FIT(),w:"wide",cap:"",pos:{al:"center",dx:0,dy:0}}
         : k==="space" ? {k:"space"} : {k, ar:"", en:""};
 
       /* توافق للخلف: shots القديمة تتحول لبلوكات تلقائيًا */
@@ -1507,9 +1517,12 @@
           }
           if(!x.src) return "";
           const f=Object.assign(FIT(),x.fit||{});
+          const P=x.pos||{}; 
+          const ps=`--dx:${P.dx||0}%;--dy:${P.dy||0}px`;
+          const al=P.al||"center";
           const fig=`<figure style="--ar:${arCss(f)}">${media(x.src,f)}</figure>`;
-          if(x.w==="pair") return `<div class="blk blk-pair">${fig}${fig}</div>`;
-          return `<div class="blk blk-${x.w||"wide"}">${fig}` +
+          if(x.w==="pair") return `<div class="blk blk-pair" data-al="${al}" style="${ps}">${fig}${fig}</div>`;
+          return `<div class="blk blk-${x.w||"wide"}" data-al="${al}" style="${ps}">${fig}` +
                  (x.cap?`<figcaption>${x.cap}</figcaption>`:"") + `</div>`;
         }).join("") + `</div>`;
       }
@@ -1555,7 +1568,8 @@
           w.audio=w.audio||"";
           w.layout=Object.assign({hero:"tall",shots:"pair",chap:"split",res:"row"},w.layout||{});
           if(!Array.isArray(w.blocks)) w.blocks=[];
-          w.blocks.forEach(b=>{ if(b.k==="image") b.fit=Object.assign(FIT(),b.fit||{}); }); });
+          w.blocks.forEach(b=>{ if(b.k==="image"){ b.fit=Object.assign(FIT(),b.fit||{});
+            b.pos=Object.assign({al:"center",dx:0,dy:0},b.pos||{}); } }); });
         return list;
       }
       normalise(LIVE);
@@ -1630,7 +1644,7 @@
             ${src?mediaPrev(src,f):'<span class="ph">اسحب الملف هنا<br>أو اضغط<br><br>صورة · متحركة · فيديو</span>'}
             <button class="x" data-clear title="حذف">✕</button>
             ${src?'<button class="x sw" data-swap title="استبدال">⇄</button>':""}
-            ${src?'<span class="zhint">اسحب = تحريك · العجلة = تكبير</span>':""}
+            ${src?'<span class="zhint">اسحب داخل الصورة = تحريك · العجلة = تكبير · المقابض = حجم الإطار</span>':""}
           </div>
           <span class="cap">${cap}</span>
           <div class="ars">${AR_PRESETS.map(([v,l])=>
@@ -1688,12 +1702,31 @@
                              <div class="bws">
                                ${BW.map(([v,l])=>`<button data-bw="${v}" data-i="${i}" data-b="${bi}"
                                  class="${(x.w||"wide")===v?"on":""}">${l}</button>`).join("")}
+                               <button data-bal="start" data-i="${i}" data-b="${bi}" title="لليمين"
+                                 class="${((x.pos||{}).al||"center")==="start"?"on":""}">⇥|</button>
+                               <button data-bal="center" data-i="${i}" data-b="${bi}" title="توسيط"
+                                 class="${((x.pos||{}).al||"center")==="center"?"on":""}">|↔|</button>
+                               <button data-bal="end" data-i="${i}" data-b="${bi}" title="لليسار"
+                                 class="${((x.pos||{}).al||"center")==="end"?"on":""}">|⇤</button>
+                               <button class="pad" data-bpad data-i="${i}" data-b="${bi}"
+                                 title="اسحب لتحريك الإطار في الصفحة">✥ <b>${(x.pos||{}).dx||0},${(x.pos||{}).dy||0}</b></button>
                                <button data-bstep="w-" data-i="${i}" data-b="${bi}" title="تضييق العرض">⇤</button>
                                <button data-bstep="w+" data-i="${i}" data-b="${bi}" title="توسيع العرض">⇥</button>
                                <button data-bstep="h-" data-i="${i}" data-b="${bi}" title="تقصير">⤒</button>
                                <button data-bstep="h+" data-i="${i}" data-b="${bi}" title="تطويل">⤓</button>
                                ${AR_PRESETS.map(([v,l])=>`<button data-bar="${v}" data-i="${i}" data-b="${bi}"
                                  class="${((x.fit||FIT()).ar)===v?"on":""}">${l}</button>`).join("")}
+                             </div>
+                             <div class="nudge" title="تحريك الإطار في الصفحة">
+                               <span></span>
+                               <button data-bn="u" data-i="${i}" data-b="${bi}" title="أعلى">▲</button>
+                               <span></span>
+                               <button data-bn="r" data-i="${i}" data-b="${bi}" title="يمين">►</button>
+                               <button class="mid" data-bpadr data-i="${i}" data-b="${bi}" title="صفّر">⟲</button>
+                               <button data-bn="l" data-i="${i}" data-b="${bi}" title="يسار">◄</button>
+                               <span></span>
+                               <button data-bn="d" data-i="${i}" data-b="${bi}" title="أسفل">▼</button>
+                               <span></span>
                              </div>`
                           : x.k==="space" ? ""
                           : `<input type="text" data-btxt="ar" data-i="${i}" data-b="${bi}"
@@ -1701,7 +1734,11 @@
                              <input type="text" data-btxt="en" data-i="${i}" data-b="${bi}"
                                value="${aEsc(x.en||"")}" placeholder="English text">`}
                       </div>
-                      <button class="ic" data-bdel data-i="${i}" data-b="${bi}">✕</button>
+                      <span class="bmove">
+                        <button class="ic" data-bup data-i="${i}" data-b="${bi}" title="أعلى">↑</button>
+                        <button class="ic" data-bdn data-i="${i}" data-b="${bi}" title="أسفل">↓</button>
+                        <button class="ic" data-bdel data-i="${i}" data-b="${bi}" title="حذف">✕</button>
+                      </span>
                     </div>`).join("")}
                 </div>
                 <div class="badd">
@@ -1823,6 +1860,13 @@
           const w=LIVE[+b.dataset.i]; ensureBlocks(w).push(NEWBLOCK(b.dataset.badd));
           admKeep(()=>{}); aToast("أُضيف بلوك");
         }));
+        admList.querySelectorAll("[data-bup],[data-bdn]").forEach(b=>b.addEventListener("click",()=>{
+          const arr=ensureBlocks(LIVE[+b.dataset.i]), k=+b.dataset.b;
+          const to = b.hasAttribute("data-bup") ? k-1 : k+1;
+          if(to<0||to>=arr.length) return;
+          const [m]=arr.splice(k,1); arr.splice(to,0,m);
+          admKeep(()=>{}); aToast("تحرّك البلوك");
+        }));
         admList.querySelectorAll("[data-bdel]").forEach(b=>b.addEventListener("click",()=>{
           const w=LIVE[+b.dataset.i]; ensureBlocks(w).splice(+b.dataset.b,1);
           admKeep(()=>{}); aToast("حُذف البلوك");
@@ -1837,6 +1881,48 @@
           const [aw,ah]=b.dataset.bar.split("/").map(Number); arSet(bl.fit,aw,ah);
           admKeep(()=>{});
         }));
+        admList.querySelectorAll("[data-bal]").forEach(b=>b.addEventListener("click",()=>{
+          const bl=ensureBlocks(LIVE[+b.dataset.i])[+b.dataset.b];
+          bl.pos=Object.assign({al:"center",dx:0,dy:0},bl.pos||{});
+          bl.pos.al=b.dataset.bal; admKeep(()=>{});
+        }));
+        admList.querySelectorAll("[data-bpadr]").forEach(b=>b.addEventListener("click",()=>{
+          const bl=ensureBlocks(LIVE[+b.dataset.i])[+b.dataset.b];
+          bl.pos=Object.assign({},bl.pos||{},{dx:0,dy:0}); admKeep(()=>{}); aToast("صُفِّر الموضع");
+        }));
+        admList.querySelectorAll("[data-bn]").forEach(b=>b.addEventListener("click",()=>{
+          const bl=ensureBlocks(LIVE[+b.dataset.i])[+b.dataset.b];
+          bl.pos=Object.assign({al:"center",dx:0,dy:0},bl.pos||{});
+          const d=b.dataset.bn;
+          if(d==="r") bl.pos.dx=Math.min(40,(bl.pos.dx||0)+2);
+          if(d==="l") bl.pos.dx=Math.max(-40,(bl.pos.dx||0)-2);
+          if(d==="u") bl.pos.dy=Math.max(-160,(bl.pos.dy||0)-12);
+          if(d==="d") bl.pos.dy=Math.min(160,(bl.pos.dy||0)+12);
+          admKeep(()=>{});
+        }));
+        /* لوح السحب: يحرّك الإطار داخل الصفحة أفقيًا ورأسيًا */
+        admList.querySelectorAll("[data-bpad]").forEach(pd=>{
+          const bl=ensureBlocks(LIVE[+pd.dataset.i])[+pd.dataset.b];
+          bl.pos=Object.assign({al:"center",dx:0,dy:0},bl.pos||{});
+          let on=false,sx=0,sy=0,x0=0,y0=0;
+          const lbl=pd.querySelector("b");
+          pd.addEventListener("pointerdown",e=>{
+            e.preventDefault(); e.stopPropagation();
+            on=true; sx=e.clientX; sy=e.clientY; x0=bl.pos.dx||0; y0=bl.pos.dy||0;
+            pd.setPointerCapture(e.pointerId); pd.classList.add("on");
+          });
+          pd.addEventListener("pointermove",e=>{
+            if(!on) return; e.stopPropagation();
+            const dir=document.documentElement.dir==="rtl"?-1:1;
+            bl.pos.dx=Math.round(Math.max(-40,Math.min(40, x0+(e.clientX-sx)*dir*0.12)));
+            bl.pos.dy=Math.round(Math.max(-160,Math.min(160, y0+(e.clientY-sy)*0.6)));
+            if(lbl) lbl.textContent=bl.pos.dx+","+bl.pos.dy;
+          });
+          const off=()=>{ if(on){ on=false; pd.classList.remove("on"); } };
+          pd.addEventListener("pointerup",off);
+          pd.addEventListener("pointercancel",off);
+          pd.addEventListener("click",e=>{e.preventDefault();e.stopPropagation();});
+        });
         admList.querySelectorAll("[data-bstep]").forEach(b=>b.addEventListener("click",()=>{
           const bl=ensureBlocks(LIVE[+b.dataset.i])[+b.dataset.b];
           bl.fit=Object.assign(FIT(),bl.fit||{});
