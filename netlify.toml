@@ -1,0 +1,15 @@
+[build]
+  publish = "."
+  functions = "netlify/functions"
+
+[[redirects]]
+  from = "/api/works"
+  to = "/.netlify/functions/works"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/api/ai-assist"
+  to = "/.netlify/functions/ai-assist"
+  status = 200
+  force = true
